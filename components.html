@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>가비아 — 디자인 시스템 컴포넌트</title>
+    <meta name="description" content="가비아 디자인 시스템 레퍼런스. 웹을 넘어 클라우드로." />
+
+    <style>
+      /* ─── Design Tokens (가비아 스타일) ──────────────────────────── */
+      :root {
+        --bg: #ffffff;
+        --surface: #f4f7fb;
+        --surface-warm: #f9fafb;
+
+        --fg: #111827;
+        --fg-2: #374151;
+        --muted: #6b7280;
+        --meta: #9ca3af;
+
+        --border: #e5e7eb;
+        --border-soft: #f0f2f5;
+
+        /* 가비아 브랜드 블루 */
+        --accent: #0067cc;
+        --accent-on: #ffffff;
+        --accent-hover: #0058b0;
+        --accent-active: #004a94;
+        --accent-light: #e8f1fb;
+
+        /* 가비아 보조 색상 */
+        --gabia-navy: #1a2d4e;
+        --gabia-sky: #e8f4ff;
+        --gabia-orange: #f97316;
+
+        --success: #16a34a;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+
+        --font-display: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, sans-serif;
+        --font-body: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, sans-serif;
+        --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+
+        --text-xs:   12px;
+        --text-sm:   13px;
+        --text-base: 15px;
+        --text-md:   16px;
+        --text-lg:   18px;
+        --text-xl:   22px;
+        --text-2xl:  28px;
+        --text-3xl:  38px;
+        --text-4xl:  52px;
+
+        --leading-body:  1.6;
+        --leading-tight: 1.2;
+
+        --tracking-display: -0.02em;
+
+        --space-1:  4px;
+        --space-2:  8px;
+        --space-3:  12px;
+        --space-4:  16px;
+        --space-5:  20px;
+        --space-6:  24px;
+        --space-8:  32px;
+        --space-10: 40px;
+        --space-12: 48px;
+
+        --section-y-desktop: 80px;
+        --section-y-tablet:  56px;
+        --section-y-phone:   40px;
+
+        --radius-xs:   4px;
+        --radius-sm:   6px;
+        --radius-md:   8px;
+        --radius-lg:   12px;
+        --radius-xl:   16px;
+        --radius-pill: 100px;
+
+        --elev-flat:   none;
+        --elev-ring:   0 0 0 1px var(--border);
+        --elev-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+        --elev-raised: 0 4px 16px rgba(0, 103, 204, 0.10), 0 1px 4px rgba(0,0,0,0.06);
+
+        --focus-ring: 0 0 0 3px rgba(0, 103, 204, 0.25);
+
+        --motion-fast:   120ms;
+        --motion-base:   200ms;
+        --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+        --container-max:            1200px;
+        --container-gutter-desktop: 24px;
+        --container-gutter-tablet:  20px;
+        --container-gutter-phone:   16px;
+      }
+
+      /* ─── Reset ───────────────────────────────────────────────── */
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: var(--text-base);
+        line-height: var(--leading-body);
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ─── Layout ─────────────────────────────────────────────── */
+      .container {
+        max-width: var(--container-max);
+        margin-inline: auto;
+        padding-inline: var(--container-gutter-desktop);
+      }
+      section {
+        padding-block: var(--section-y-desktop);
+      }
+      .band-light { background: var(--bg); color: var(--fg); }
+      .band-soft  { background: var(--surface); color: var(--fg); }
+      .band-warm  { background: var(--surface-warm); color: var(--fg); }
+      .band-navy  { background: var(--gabia-navy); color: #ffffff; }
+      @media (max-width: 1023px) {
+        .container { padding-inline: var(--container-gutter-tablet); }
+        section { padding-block: var(--section-y-tablet); }
+      }
+      @media (max-width: 639px) {
+        .container { padding-inline: var(--container-gutter-phone); }
+        section { padding-block: var(--section-y-phone); }
+      }
+
+      /* ─── Typography ─────────────────────────────────────────── */
+      h1, h2, h3, h4 {
+        font-family: var(--font-display);
+        margin: 0;
+        color: var(--fg);
+        word-break: keep-all;
+      }
+      h1 {
+        font-size: var(--text-4xl);
+        font-weight: 700;
+        line-height: var(--leading-tight);
+        letter-spacing: var(--tracking-display);
+      }
+      h2 {
+        font-size: var(--text-3xl);
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: var(--tracking-display);
+      }
+      h3 {
+        font-size: var(--text-xl);
+        font-weight: 600;
+        line-height: 1.35;
+      }
+      h4 {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      p { margin: 0; }
+
+      .lead {
+        font-size: var(--text-lg);
+        line-height: 1.65;
+        color: var(--fg-2);
+        font-weight: 400;
+      }
+      .body-muted { color: var(--muted); }
+      .body-meta  { color: var(--meta); font-size: var(--text-sm); }
+      .body-sm    { font-size: var(--text-sm); }
+
+      .eyebrow {
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        line-height: 1;
+        color: var(--accent);
+        letter-spacing: 0.04em;
+      }
+
+      .stack-3 > * + * { margin-block-start: var(--space-3); }
+      .stack-4 > * + * { margin-block-start: var(--space-4); }
+      .stack-6 > * + * { margin-block-start: var(--space-6); }
+
+      /* ─── 버튼 ────────────────────────────────────────────────── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        padding: 9px 18px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-sm);
+        font-family: var(--font-body);
+        font-weight: 500;
+        font-size: var(--text-sm);
+        line-height: 1.4;
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          background-color var(--motion-fast) var(--ease-standard),
+          border-color    var(--motion-fast) var(--ease-standard),
+          box-shadow      var(--motion-fast) var(--ease-standard),
+          transform       var(--motion-fast) var(--ease-standard);
+      }
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
+      }
+      .btn:active { transform: scale(0.98); }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-on);
+        border-color: var(--accent);
+      }
+      .btn-primary:hover  { background: var(--accent-hover); border-color: var(--accent-hover); }
+      .btn-primary:active { background: var(--accent-active); }
+
+      .btn-secondary {
+        background: var(--bg);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .btn-secondary:hover {
+        background: var(--accent-light);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--fg-2);
+        border-color: var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--surface);
+        border-color: var(--meta);
+      }
+
+      .btn-lg {
+        padding: 13px 28px;
+        font-size: var(--text-md);
+        border-radius: var(--radius-md);
+        font-weight: 600;
+      }
+
+      /* 가비아 스타일 CTA 버튼 (둥근 형태) */
+      .btn-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 12px 26px;
+        border: none;
+        border-radius: var(--radius-pill);
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: var(--text-md);
+        line-height: 1.3;
+        cursor: pointer;
+        text-decoration: none;
+        background: var(--accent);
+        color: var(--accent-on);
+        transition:
+          background-color var(--motion-fast) var(--ease-standard),
+          transform        var(--motion-fast) var(--ease-standard),
+          box-shadow       var(--motion-fast) var(--ease-standard);
+      }
+      .btn-pill:hover  { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(0,103,204,0.3); }
+      .btn-pill:active { background: var(--accent-active); transform: scale(0.98); }
+      .btn-pill:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+      .btn-pill-secondary {
+        background: var(--bg);
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+      }
+      .btn-pill-secondary:hover {
+        background: var(--accent-light);
+        box-shadow: none;
+      }
+
+      /* ─── 입력 폼 ─────────────────────────────────────────────── */
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .field label {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--fg);
+      }
+      .field input, .field select {
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        line-height: 1.5;
+        outline: none;
+        transition:
+          border-color var(--motion-fast) var(--ease-standard),
+          box-shadow   var(--motion-fast) var(--ease-standard);
+      }
+      .field input::placeholder { color: var(--meta); }
+      .field input:hover { border-color: var(--muted); }
+      .field input:focus-visible, .field input:focus {
+        border-color: var(--accent);
+        box-shadow: var(--focus-ring);
+      }
+      .field-help {
+        font-size: var(--text-xs);
+        color: var(--muted);
+      }
+      .field-error {
+        font-size: var(--text-xs);
+        color: var(--danger);
+      }
+
+      /* ─── 카드 ─────────────────────────────────────────────────── */
+      .card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        transition: box-shadow var(--motion-base) var(--ease-standard),
+                    border-color var(--motion-base) var(--ease-standard);
+      }
+      .card:hover {
+        box-shadow: var(--elev-raised);
+        border-color: #cfe2f8;
+      }
+      .card-feature {
+        background: linear-gradient(135deg, var(--gabia-sky) 0%, #f0f7ff 100%);
+        border: 1px solid #cfe2f8;
+        border-radius: var(--radius-xl);
+        padding: var(--space-8) var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        box-shadow: var(--elev-raised);
+      }
+
+      /* 서비스 카드 (가비아 메인 스타일) */
+      .service-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        text-align: center;
+        transition: box-shadow var(--motion-base) var(--ease-standard),
+                    transform var(--motion-base) var(--ease-standard);
+      }
+      .service-card:hover {
+        box-shadow: var(--elev-raised);
+        transform: translateY(-2px);
+      }
+      .service-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        background: var(--accent-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-inline: auto;
+        color: var(--accent);
+      }
+
+      /* ─── 배지 ─────────────────────────────────────────────────── */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        padding: 3px 10px;
+        border-radius: var(--radius-pill);
+        font-family: var(--font-body);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        line-height: 1.5;
+      }
+      .badge-success {
+        color: #166534;
+        background: #dcfce7;
+      }
+      .badge-info {
+        color: var(--accent);
+        background: var(--accent-light);
+      }
+      .badge-warn {
+        color: #92400e;
+        background: #fef3c7;
+      }
+      .badge-new {
+        color: #ffffff;
+        background: var(--gabia-orange);
+      }
+      .badge-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      /* ─── 링크 ─────────────────────────────────────────────────── */
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      /* ─── kbd ─────────────────────────────────────────────────── */
+      kbd {
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        padding: 2px 6px;
+        border-radius: var(--radius-xs);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--fg-2);
+      }
+
+      /* ─── 네비게이션 ─────────────────────────────────────────────
+       * 가비아 GNB: 흰 배경, 파란 브랜드 로고, 상단 유틸리티 바 포함 */
+      .topbar {
+        background: var(--gabia-navy);
+        height: 34px;
+        display: flex;
+        align-items: center;
+      }
+      .topbar-inner {
+        max-width: var(--container-max);
+        margin-inline: auto;
+        padding-inline: var(--container-gutter-desktop);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-5);
+        width: 100%;
+      }
+      .topbar a {
+        color: rgba(255,255,255,0.75);
+        font-size: var(--text-xs);
+        text-decoration: none;
+        transition: color var(--motion-fast) var(--ease-standard);
+      }
+      .topbar a:hover { color: #fff; text-decoration: none; }
+      .topbar-divider {
+        width: 1px;
+        height: 10px;
+        background: rgba(255,255,255,0.25);
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--elev-sm);
+      }
+      .nav-inner {
+        max-width: var(--container-max);
+        margin-inline: auto;
+        padding-inline: var(--container-gutter-desktop);
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-8);
+      }
+      .nav-brand {
+        font-family: var(--font-display);
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: -0.03em;
+        flex-shrink: 0;
+      }
+      .nav-links {
+        display: flex;
+        gap: var(--space-1);
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+      }
+      .nav-links a {
+        display: block;
+        padding: 6px 12px;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--fg-2);
+        border-radius: var(--radius-sm);
+        transition: background var(--motion-fast) var(--ease-standard),
+                    color var(--motion-fast) var(--ease-standard);
+        text-decoration: none;
+      }
+      .nav-links a:hover {
+        background: var(--surface);
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex-shrink: 0;
+      }
+      @media (max-width: 639px) {
+        .topbar { display: none; }
+        .nav-inner { padding-inline: var(--container-gutter-phone); height: 52px; }
+        .nav-links { display: none; }
+        .nav-brand { font-size: 20px; }
+      }
+
+      /* ─── 섹션 레이아웃 ──────────────────────────────────────────── */
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: var(--space-12);
+        align-items: center;
+      }
+      @media (max-width: 1023px) {
+        .hero-grid { grid-template-columns: 1fr; gap: var(--space-8); }
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-block-start: var(--space-6);
+      }
+      .hero-meta {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        padding: var(--space-6);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background: var(--bg);
+        box-shadow: var(--elev-sm);
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr 1fr;
+        gap: var(--space-5);
+      }
+      @media (max-width: 1023px) {
+        .features-grid { grid-template-columns: 1fr 1fr; }
+        .features-grid > :first-child { grid-column: span 2; }
+      }
+      @media (max-width: 639px) {
+        .features-grid { grid-template-columns: 1fr; }
+        .features-grid > :first-child { grid-column: auto; }
+      }
+
+      /* 서비스 그리드 (4열 — 가비아 서비스 메뉴 스타일) */
+      .service-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-4);
+        margin-block-start: var(--space-8);
+      }
+      @media (max-width: 1023px) {
+        .service-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 639px) {
+        .service-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: var(--space-12);
+        align-items: start;
+      }
+      @media (max-width: 1023px) {
+        .form-row { grid-template-columns: 1fr; gap: var(--space-8); }
+      }
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-block-start: var(--space-2);
+      }
+
+      /* 도메인 검색바 (가비아 메인 특징) */
+      .domain-search {
+        display: flex;
+        border: 2px solid var(--accent);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        max-width: 560px;
+      }
+      .domain-search-prefix {
+        padding: 0 var(--space-4);
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        font-size: var(--text-sm);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .domain-search input {
+        flex: 1;
+        padding: 12px var(--space-4);
+        border: none;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: var(--text-md);
+        outline: none;
+      }
+      .domain-search input::placeholder { color: var(--meta); }
+      .domain-search button {
+        padding: 0 var(--space-6);
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        font-family: var(--font-body);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--motion-fast) var(--ease-standard);
+        white-space: nowrap;
+      }
+      .domain-search button:hover { background: var(--accent-hover); }
+
+      /* 신뢰 지표 바 */
+      .trust-bar {
+        display: flex;
+        gap: var(--space-8);
+        flex-wrap: wrap;
+      }
+      .trust-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .trust-number {
+        font-size: var(--text-2xl);
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .trust-label {
+        font-size: var(--text-xs);
+        color: var(--muted);
+      }
+
+      .icon { width: 16px; height: 16px; flex-shrink: 0; }
+      .row-between {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+      }
+
+      /* 섹션 구분선 대신 타이틀 레이아웃 */
+      .section-header {
+        text-align: center;
+        max-width: 600px;
+        margin-inline: auto;
+        margin-block-end: var(--space-10);
+      }
+      .section-header .eyebrow {
+        margin-block-end: var(--space-3);
+      }
+
+      /* 고객 지원 CTA 패널 */
+      .support-panel {
+        background: var(--gabia-navy);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        color: #fff;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-6);
+        align-items: center;
+      }
+      @media (max-width: 639px) {
+        .support-panel { grid-template-columns: 1fr; }
+      }
+      .support-contacts {
+        display: flex;
+        gap: var(--space-8);
+        flex-wrap: wrap;
+        margin-block-start: var(--space-4);
+      }
+      .support-contact-item strong {
+        display: block;
+        font-size: var(--text-xl);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .support-contact-item span {
+        font-size: var(--text-xs);
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 상단 유틸리티 바 -->
+    <div class="topbar">
+      <div class="topbar-inner">
+        <a href="#">로그인</a>
+        <div class="topbar-divider"></div>
+        <a href="#">회원가입</a>
+        <div class="topbar-divider"></div>
+        <a href="#">고객센터</a>
+        <div class="topbar-divider"></div>
+        <a href="#">이벤트</a>
+      </div>
+    </div>
+
+    <!-- GNB 네비게이션 -->
+    <header class="nav" data-od-id="nav">
+      <div class="nav-inner">
+        <span class="nav-brand">gabia</span>
+        <nav aria-label="주메뉴">
+          <ul class="nav-links">
+            <li><a href="#hero">도메인</a></li>
+            <li><a href="#services">호스팅</a></li>
+            <li><a href="#features">클라우드</a></li>
+            <li><a href="#form">보안</a></li>
+            <li><a href="#support">그룹웨어</a></li>
+          </ul>
+        </nav>
+        <div class="nav-actions">
+          <a href="#" class="btn btn-ghost body-sm">로그인</a>
+          <a href="#" class="btn btn-primary body-sm">회원가입</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- 히어로 섹션 -->
+      <section class="band-light" data-od-id="hero" id="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="stack-4">
+              <p class="eyebrow">웹을 넘어 클라우드로</p>
+              <h1>비즈니스에 필요한<br>IT 인프라, 가비아</h1>
+              <p class="lead" style="max-width: 48ch">
+                도메인부터 클라우드, 그룹웨어까지.
+                국내 1위 IT 인프라 파트너와 함께
+                안정적인 비즈니스를 시작하세요.
+              </p>
+
+              <!-- 도메인 검색바 — 가비아 메인의 핵심 기능 -->
+              <div class="domain-search" style="margin-block-start: var(--space-4);">
+                <div class="domain-search-prefix">WWW.</div>
+                <input type="text" placeholder="원하는 도메인을 입력하세요" />
+                <button type="button">검색</button>
+              </div>
+
+              <div class="hero-actions">
+                <a href="#services" class="btn-pill">
+                  서비스 둘러보기
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+                <a href="#" class="btn-pill btn-pill-secondary">클라우드 시작하기</a>
+              </div>
+            </div>
+
+            <!-- 신뢰 지표 패널 -->
+            <aside class="hero-meta" aria-label="서비스 현황">
+              <div class="row-between">
+                <span class="body-sm" style="font-weight: 600;">서비스 현황</span>
+                <span class="badge badge-success">
+                  <span class="badge-dot" aria-hidden="true"></span>
+                  정상 운영 중
+                </span>
+              </div>
+              <div class="trust-bar">
+                <div class="trust-item">
+                  <span class="trust-number">1,800만</span>
+                  <span class="trust-label">등록 도메인</span>
+                </div>
+                <div class="trust-item">
+                  <span class="trust-number">24년</span>
+                  <span class="trust-label">서비스 운영</span>
+                </div>
+                <div class="trust-item">
+                  <span class="trust-number">99.9%</span>
+                  <span class="trust-label">SLA 보장</span>
+                </div>
+              </div>
+              <p class="body-sm body-muted">
+                장애 상담은 <strong>24시간</strong> 접수 가능합니다.
+                <kbd>1544</kbd>-<kbd>4370</kbd>
+              </p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- 주요 서비스 섹션 -->
+      <section class="band-soft" data-od-id="services" id="services">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">주요 서비스</p>
+            <h2>필요한 IT 서비스를<br>한 곳에서</h2>
+          </div>
+
+          <div class="service-grid">
+            <div class="service-card">
+              <div class="service-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <h4>도메인</h4>
+              <p class="body-sm body-muted">국내외 다양한 도메인을 합리적인 가격으로 등록하세요.</p>
+              <a href="#" class="body-sm">자세히 보기 →</a>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <h4>웹호스팅</h4>
+              <p class="body-sm body-muted">빠르고 안정적인 서버로 내 홈페이지를 운영하세요.</p>
+              <a href="#" class="body-sm">자세히 보기 →</a>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+              </div>
+              <h4>클라우드</h4>
+              <p class="body-sm body-muted">유연하게 확장되는 클라우드 인프라를 경험하세요.</p>
+              <a href="#" class="body-sm">자세히 보기 →</a>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <h4>기업 메일</h4>
+              <p class="body-sm body-muted">비즈니스 전용 메일과 그룹웨어로 협업하세요.</p>
+              <a href="#" class="body-sm">자세히 보기 →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 특장점 섹션 -->
+      <section class="band-light" data-od-id="features" id="features">
+        <div class="container">
+          <div class="stack-3" style="max-width: 680px">
+            <p class="eyebrow">가비아를 선택해야 하는 이유</p>
+            <h2>전문성과 경험, 안정성을 하나로</h2>
+            <p class="lead body-muted">
+              국내 최초, 업계 유일의 품질보장제(SLA)로 안정된 서비스 운영을 보장합니다.
+            </p>
+          </div>
+
+          <div class="features-grid" style="margin-block-start: var(--space-10)">
+            <article class="card-feature">
+              <p class="eyebrow">핵심 강점</p>
+              <h3>24년 업계 1위의 전문성과 경험</h3>
+              <p class="body-muted">
+                국내 최초 품질보장제(SLA)를 도입하고, 전문 엔지니어가 365일 24시간 IDC에 상주하며 실시간으로 이슈에 대응합니다. 1,800만 도메인, 100만 고객사의 신뢰가 증명합니다.
+              </p>
+              <div>
+                <a href="#" class="btn btn-primary">서비스 알아보기</a>
+              </div>
+            </article>
+
+            <article class="card">
+              <span class="badge badge-info">보안</span>
+              <h3>강력한 보안 관제</h3>
+              <p class="body-muted body-sm">
+                전문 보안 관제팀이 24시간 맞춤형 보안 정책을 수립하여 고객의 정보 자산을 안전하게 보호합니다.
+              </p>
+              <a href="#" class="body-sm">보안 서비스 보기 →</a>
+            </article>
+
+            <article class="card">
+              <span class="badge badge-warn">클라우드</span>
+              <h3>멀티클라우드 지원</h3>
+              <p class="body-muted body-sm">
+                AWS, Azure, 가비아 클라우드를 한 곳에서 통합 관리. 클라우드 전환부터 운영까지 전문가가 함께합니다.
+              </p>
+              <a href="#" class="body-sm">클라우드 살펴보기 →</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 문의 / 연장 폼 섹션 -->
+      <section class="band-warm" data-od-id="form" id="form">
+        <div class="container">
+          <div class="form-row">
+            <div class="stack-4">
+              <p class="eyebrow">서비스 문의</p>
+              <h2>궁금한 점이 있으신가요?</h2>
+              <p class="lead body-muted" style="max-width: 46ch">
+                서비스 이용에 궁금한 점을 남겨주시면
+                담당자가 빠르게 답변드리겠습니다.
+                일반 상담은 평일 09:00~18:00에 운영합니다.
+              </p>
+            </div>
+
+            <form class="form" onsubmit="event.preventDefault();">
+              <div class="field">
+                <label for="email">이메일 주소</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="example@gabia.com"
+                  autocomplete="email"
+                  required
+                />
+                <p class="field-help">답변은 입력하신 메일로 발송됩니다.</p>
+              </div>
+              <div class="field">
+                <label for="inquiry">문의 유형</label>
+                <select id="inquiry">
+                  <option>도메인 등록 / 연장</option>
+                  <option>호스팅 서비스</option>
+                  <option>클라우드 / IDC</option>
+                  <option>그룹웨어 / 보안</option>
+                  <option>기타 문의</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  문의 접수하기
+                </button>
+                <button type="button" class="btn btn-ghost">
+                  자주 묻는 질문
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 고객 지원 섹션 -->
+      <section class="band-soft" data-od-id="support" id="support">
+        <div class="container">
+          <div class="support-panel">
+            <div>
+              <h3 style="color: #fff; font-size: var(--text-2xl);">서비스 이용에 궁금한 점이 있으신가요?</h3>
+              <p style="color: rgba(255,255,255,0.7); margin-block-start: var(--space-2); font-size: var(--text-sm);">
+                전문 상담사가 빠르게 도와드립니다.
+              </p>
+              <div class="support-contacts">
+                <div class="support-contact-item">
+                  <strong>1544-4370</strong>
+                  <span>일반 상담 (평일 9~18시)</span>
+                </div>
+                <div class="support-contact-item">
+                  <strong>1661-4370</strong>
+                  <span>메일·그룹웨어 전용</span>
+                </div>
+                <div class="support-contact-item">
+                  <strong>02-3473-3911</strong>
+                  <span>IDC·클라우드·보안</span>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <a href="#" class="btn-pill" style="background: #fff; color: var(--accent);">서비스 매뉴얼</a>
+              <a href="#" class="btn-pill btn-pill-secondary" style="color: #fff; border-color: rgba(255,255,255,0.5);">자주 묻는 질문</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
